@@ -1,0 +1,1 @@
+# AITK345-exp-bot-fasttext-module
