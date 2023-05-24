@@ -1,11 +1,11 @@
 """
 классификатор KNeighborsClassifier в /home/an/Data/Yandex.Disk/dev/03-jira-tasks/aitk115-support-questions
 """
-from data_types import Parameters
-from storage import ElasticClient
-from texts_processing import TextsTokenizer
-from utils import timeout
-from config import logger
+from src.data_types import Parameters
+from src.storage import ElasticClient
+from src.texts_processing import TextsTokenizer
+from src.utils import timeout
+from src.config import logger
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -24,14 +24,15 @@ class FastAnswerClassifier:
         self.ft_model = ft_model
 
     @timeout(float(tmt))
-    def searching(self, text: str, pubid: int, score: float):
+    async def searching(self, text: str, pubid: int, score: float):
         """"""
         """searching etalon by  incoming text"""
         try:
             tokens = self.tkz([text])
             if tokens[0]:
                 tokens_str = " ".join(tokens[0])
-                etalons_search_result = self.es.texts_search(self.prm.clusters_index, "LemCluster", [tokens_str])
+                etalons_search_result = await self.es.texts_search(self.prm.clusters_index, "LemCluster", [tokens_str])
+                # print("etalons search result:\n", etalons_search_result)
                 result_dicts = etalons_search_result[0]["search_results"]
                 if result_dicts:
                     results_tuples = [(d["ID"], d["Cluster"], d["LemCluster"]) for d in result_dicts]
@@ -43,16 +44,16 @@ class FastAnswerClassifier:
                     scores = cosine_similarity(q_vc.reshape(1, 100), et_vcs)[0]
                     the_best_result = sorted(list(zip(ids, ets, lm_ets, scores)), key=lambda x: x[3], reverse=True)[0]
                     if the_best_result[3] >= score:
-                        answers_search_result = self.es.answer_search(self.prm.answers_index, the_best_result[0], pubid)
+                        print("Fast Text Score:", the_best_result[3])
+                        answers_search_result = await self.es.answer_search(self.prm.answers_index, the_best_result[0], pubid)
                         if answers_search_result["search_results"]:
+                                print()
                                 search_result = {"templateId": answers_search_result["search_results"][0]["templateId"],
-                                                 "templateText": answers_search_result["search_results"][0][
-                                                     "templateText"]}
+                                                 "templateText": answers_search_result["search_results"][0]["templateText"]}
                                 logger.info("search completed successfully with result: {}".format(str(search_result)))
                                 return search_result
                         else:
-                            logger.info("not found answer with templateId {} and pub_id {}".format(str(d["ID"]),
-                                                                                                       str(pubid)))
+                            logger.info("not found answer with templateId {} and pub_id {}".format(str(the_best_result[0]), str(pubid)))
                     else:
                         logger.info("elasticsearch doesn't find any etalons for input text {}".format(str(text)))
                         return {"templateId": 0, "templateText": ""}

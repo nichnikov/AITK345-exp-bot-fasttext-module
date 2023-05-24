@@ -4,11 +4,11 @@ from __future__ import annotations
 import os
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.helpers import async_bulk
-from config import (logger,
+from src.config import (logger,
                         PROJECT_ROOT_DIR,
                         parameters)
-from utils import jaccard_similarity
-from data_types import TextsDeleteSample
+from src.utils import jaccard_similarity
+from src.data_types import TextsDeleteSample
 from pydantic import BaseSettings
 
 
@@ -41,7 +41,6 @@ class ElasticClient(AsyncElasticsearch):
                 min_score=0,
                 index=index,
                 query={"match": {field: tx}},
-                # size=self.settings.max_hits,
                 size=100,
             )
             return resp
@@ -81,7 +80,7 @@ class ElasticClient(AsyncElasticsearch):
                         ]
                     }
                 },
-                size=self.settings.max_hits,
+                size=100
             )
             return resp
 
