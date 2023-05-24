@@ -3,7 +3,7 @@ import json
 import logging
 import pandas as pd
 from pathlib import Path
-from src.data_types import Parameters
+from data_types import Parameters
 
 
 def get_project_root() -> Path:
@@ -12,6 +12,8 @@ def get_project_root() -> Path:
 
 
 PROJECT_ROOT_DIR = get_project_root()
+
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s.%(msecs)03d %(levelname)s %(module)s - %(funcName)s: %(message)s',

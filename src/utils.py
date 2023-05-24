@@ -1,13 +1,13 @@
 import functools
 import multiprocessing.pool
 from functools import wraps
-from src.config import logger
+from config import logger
 import pandas as pd
-from src.texts_processing import TextsTokenizer
+from texts_processing import TextsTokenizer
 import time
 
 
-def texts_tokenize(texts: [], stopwords_roots: []):
+def texts_tokenize(texts: list, stopwords_roots: list):
     tokenizer = TextsTokenizer()
     stopwords = []
 

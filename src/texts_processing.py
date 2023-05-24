@@ -5,7 +5,7 @@ from itertools import groupby
 import operator
 
 
-def group_gen(asc_dsc: []):
+def group_gen(asc_dsc: list):
     """генератор"""
     it = groupby(sorted(asc_dsc, key=lambda x: x[1]), operator.itemgetter(1))
     for k, v in it:
@@ -21,7 +21,7 @@ class TextsTokenizer:
         self.stop_words_patterns = re.compile("")
         self.m = Mystem()
 
-    def texts2tokens(self, texts: [str]) -> [str]:
+    def texts2tokens(self, texts: list[str]) -> list[str]:
         """Lemmatization for texts in list. It returns list with lemmatized texts"""
         try:
             text_ = "\n".join(texts)
@@ -31,12 +31,12 @@ class TextsTokenizer:
         except TypeError as e:
             return []
 
-    def add_stopwords(self, stopwords: [str]):
+    def add_stopwords(self, stopwords: list[str]):
         """adding stop words into class"""
         self.stopwords = [" ".join(x) for x in self.texts2tokens(stopwords)]
         self.stop_words_patterns = re.compile("|".join([r"\b" + tx + r"\b" for tx in self.stopwords]))
 
-    def add_synonyms(self, synonyms: [(str)]):
+    def add_synonyms(self, synonyms: list[(str)]):
         """adding stop words into class"""
         ascs, dscs = zip(*synonyms)
         lm_ascs = [" ".join(x) for x in self.tokenization(list(ascs))]
@@ -44,13 +44,13 @@ class TextsTokenizer:
         for asc in syns_dct:
             self.synonyms.append((asc, re.compile("|".join([r"\b" + w + r"\b" for w in syns_dct[asc]]))))
 
-    def del_stopwords(self, stopwords: [str]):
+    def del_stopwords(self, stopwords: list[str]):
         """adding stop words into class"""
         stopwords_del = [x for x in chain(*self.texts2tokens(stopwords))]
         self.stopwords = [w for w in self.stopwords if w not in stopwords_del]
         self.stop_words_patterns = re.compile("|".join([r"\b" + tx + r"\b" for tx in self.stopwords]))
 
-    def tokenization(self, texts: [str]) -> [[]]:
+    def tokenization(self, texts: list[str]) -> list[list]:
         """list of texts lemmatization with stop words deleting"""
         lemm_texts = self.texts2tokens(texts)
         if self.synonyms:
@@ -66,7 +66,7 @@ class TextsTokenizer:
         else:
             return lemm_texts
 
-    def __call__(self, texts: [str]):
+    def __call__(self, texts: list[str]):
         return self.tokenization(texts)
 
 

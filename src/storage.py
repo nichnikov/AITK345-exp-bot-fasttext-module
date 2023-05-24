@@ -4,11 +4,11 @@ from __future__ import annotations
 import os
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.helpers import async_bulk
-from src.config import (logger,
+from config import (logger,
                         PROJECT_ROOT_DIR,
                         parameters)
-from src.utils import jaccard_similarity
-from src.data_types import TextsDeleteSample
+from utils import jaccard_similarity
+from data_types import TextsDeleteSample
 from pydantic import BaseSettings
 
 
